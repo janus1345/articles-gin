@@ -10,6 +10,7 @@ import (
 )
 
 var tmpArticleList []models.Article
+var tmpUserList []models.User
 
 func TestMain(m *testing.M) {
 	gin.SetMode(gin.TestMode)
@@ -25,7 +26,7 @@ func getRouter(withTemplates bool) *gin.Engine {
 	return r
 }
 
-func testHTTPResponse(t *testing.T, r *gin.Engine, req *http.Request, f func(w *httptest.ResponseRecorder) bool)  {
+func testHTTPResponse(t *testing.T, r *gin.Engine, req *http.Request, f func(w *httptest.ResponseRecorder) bool) {
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	if !f(w) {
@@ -34,9 +35,11 @@ func testHTTPResponse(t *testing.T, r *gin.Engine, req *http.Request, f func(w *
 }
 
 func saveLists() {
+	tmpUserList = models.UserList
 	tmpArticleList = models.ArticleList
 }
 
 func restoreList() {
 	models.ArticleList = tmpArticleList
+	models.UserList = tmpUserList
 }
