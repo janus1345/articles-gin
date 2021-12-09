@@ -1,8 +1,15 @@
 package main
 
-import "articles/handlers"
+import (
+	"articles/handlers"
+)
 
 func InitializeRoutes() {
 	router.GET("/", handlers.ShowIndexPage)
 	router.GET("/article/view/:article_id", handlers.GetArticle)
+	userRoutes := router.Group("/user")
+	{
+		userRoutes.GET("/register", handlers.ShowRegistrationPage)
+		userRoutes.POST("/register", handlers.Register)
+	}
 }
