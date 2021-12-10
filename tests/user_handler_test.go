@@ -132,3 +132,17 @@ func TestLoginUnauthenticatedIncorrectCredentials(t *testing.T) {
 	}
 	restoreList()
 }
+
+func TestLogout(t *testing.T) {
+	r := getRouter(true)
+	r.GET("/user/logout", handlers.Logout)
+	req, _ := http.NewRequest("GET", "/user/logout", nil)
+	testHTTPResponse(t, r, req, func(w *httptest.ResponseRecorder) bool {
+		statOk := w.Code == http.StatusTemporaryRedirect
+
+		p, err := ioutil.ReadAll(w.Body)
+		fmt.Println(string(p))
+		pageOk := err == nil && strings.Index(string(p), "Temporary Redirect") > 0
+		return statOk && pageOk
+	})
+}
