@@ -14,7 +14,7 @@
     </p>
     {{end}}
     <!--Create a form that POSTs to the `/u/register` route-->
-    <form class="form" action="/u/register" method="POST">
+    <form class="form" action="/user/register" method="POST">
       <div class="form-group">
         <label for="username">Username</label>
         <input type="text" class="form-control" id="username" name="username" placeholder="Username">
@@ -31,4 +31,3 @@
 
 <!--Embed the footer.html template at this location-->
 {{ template "footer.html" .}}
-
