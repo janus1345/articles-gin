@@ -3,17 +3,17 @@ package models
 import "errors"
 
 type Article struct {
-	Id int `json:"id"`
+	Id      int    `json:"id"`
 	Content string `json:"content"`
-	Title string `json:"title"`
+	Title   string `json:"title"`
 }
 
 var ArticleList = []Article{
 	{1, "article 1 body", "article 1"},
-	{1, "article 1 body", "article 1"},
+	{2, "article 2 body", "article 2"},
 }
 
-func GetAllArticles() []Article{
+func GetAllArticles() []Article {
 	return ArticleList
 }
 

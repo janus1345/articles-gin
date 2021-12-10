@@ -26,6 +26,7 @@ func TestShowRegistrationPageUnauthenticated(t *testing.T) {
 }
 
 func TestRegisterUnauthenticated(t *testing.T) {
+	saveLists()
 	w := httptest.NewRecorder()
 	r := getRouter(true)
 	r.POST("/user/register", handlers.Register)
@@ -42,9 +43,11 @@ func TestRegisterUnauthenticated(t *testing.T) {
 	if err != nil || strings.Index(string(p), "<title>Successful registration &amp;&amp; Login</title>") < 0 {
 		t.Fail()
 	}
+	restoreList()
 }
 
 func TestRegisterUnauthenticatedUnavailableUsername(t *testing.T) {
+	saveLists()
 	w := httptest.NewRecorder()
 	r := getRouter(true)
 	r.POST("/user/register", handlers.Register)
@@ -56,6 +59,7 @@ func TestRegisterUnauthenticatedUnavailableUsername(t *testing.T) {
 	if w.Code != http.StatusBadRequest {
 		t.Fail()
 	}
+	restoreList()
 }
 
 func getLoginPOSTPayload() string {
@@ -70,4 +74,61 @@ func getRegistrationPOSTPayload() string {
 	params.Add("username", "u1")
 	params.Add("password", "p1")
 	return params.Encode()
+}
+
+func TestShowLoginPageUnauthenticated(t *testing.T) {
+	r := getRouter(true)
+	r.GET("/user/login", handlers.ShowLoginPage)
+
+	req, _ := http.NewRequest("GET", "/user/login", nil)
+
+	testHTTPResponse(t, r, req, func(w *httptest.ResponseRecorder) bool {
+		statusOk := w.Code == http.StatusOK
+		p, err := ioutil.ReadAll(w.Body)
+		pageOk := err == nil || strings.Index(string(p), "<title>Login</title>") > 0
+		return statusOk && pageOk
+	})
+}
+
+func TestLoginUnauthenticated(t *testing.T) {
+	saveLists()
+	w := httptest.NewRecorder()
+
+	r := getRouter(true)
+	r.POST("/user/login", handlers.PerformLogin)
+
+	loginPayload := getLoginPOSTPayload()
+	req, _ := http.NewRequest("POST", "/user/login", strings.NewReader(loginPayload))
+	req.Header.Add("Content-Type", "application/x-www-urlencoded")
+	req.Header.Add("Content-Length", strconv.Itoa(len(loginPayload)))
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fail()
+	}
+	p, err := ioutil.ReadAll(w.Body)
+	if err != nil || strings.Index(string(p), "<title>Successful Login</title>") < 0 {
+		t.Fail()
+	}
+	restoreList()
+}
+
+func TestLoginUnauthenticatedIncorrectCredentials(t *testing.T) {
+	saveLists()
+
+	w := httptest.NewRecorder()
+
+	r := getRouter(true)
+	r.POST("/user/login", handlers.PerformLogin)
+	loginPayload := getRegistrationPOSTPayload()
+	req, _ := http.NewRequest("POST", "/user/login", strings.NewReader(loginPayload))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Length", strconv.Itoa(len(loginPayload)))
+
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusBadRequest {
+		fmt.Println("***************", w.Code)
+		t.Fail()
+	}
+	restoreList()
 }
