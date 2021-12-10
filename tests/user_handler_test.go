@@ -141,7 +141,6 @@ func TestLogout(t *testing.T) {
 		statOk := w.Code == http.StatusTemporaryRedirect
 
 		p, err := ioutil.ReadAll(w.Body)
-		fmt.Println(string(p))
 		pageOk := err == nil && strings.Index(string(p), "Temporary Redirect") > 0
 		return statOk && pageOk
 	})
