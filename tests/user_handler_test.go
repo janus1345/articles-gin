@@ -99,15 +99,15 @@ func TestLoginUnauthenticated(t *testing.T) {
 
 	loginPayload := getLoginPOSTPayload()
 	req, _ := http.NewRequest("POST", "/user/login", strings.NewReader(loginPayload))
-	req.Header.Add("Content-Type", "application/x-www-urlencoded")
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Content-Length", strconv.Itoa(len(loginPayload)))
 	r.ServeHTTP(w, req)
-
+	fmt.Println(w.Code)
 	if w.Code != http.StatusOK {
 		t.Fail()
 	}
 	p, err := ioutil.ReadAll(w.Body)
-	if err != nil || strings.Index(string(p), "<title>Successful Login</title>") < 0 {
+	if err != nil || strings.Index(string(p), "<title>Successful login</title>") < 0 {
 		t.Fail()
 	}
 	restoreList()

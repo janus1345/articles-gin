@@ -41,6 +41,7 @@ func ShowLoginPage(c *gin.Context) {
 func PerformLogin(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
+
 	if isUserValid(username, password) {
 		token := generateSessionToken()
 		c.SetCookie("token", token, 3600, "", "", false, false)
