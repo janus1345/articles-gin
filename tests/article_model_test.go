@@ -19,6 +19,13 @@ func TestGetAllArticles(t *testing.T) {
 	}
 }
 
+func TestGetArticleByID(t *testing.T) {
+	a, err := models.GetArticleById(1)
+	if err != nil || a.Id != 1 || a.Title != "article 1" || a.Content != "article 1 body" {
+		t.Fail()
+	}
+}
+
 func TestCreateNewArticle(t *testing.T) {
 	saveLists()
 	originalLength := len(models.GetAllArticles())

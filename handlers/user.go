@@ -22,7 +22,7 @@ func Register(c *gin.Context) {
 	if _, err := models.RegisterNewUser(username, password); err == nil {
 		token := generateSessionToken()
 		c.SetCookie("token", token, 3600, "", "", false, false)
-		c.Set("is_logged_in", "true")
+		//c.Set("is_logged_in", "true")
 		render(c, gin.H{"title": "Successful registration && Login"}, "login-successful.html")
 	} else {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{

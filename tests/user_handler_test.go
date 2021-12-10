@@ -2,6 +2,7 @@ package tests
 
 import (
 	"articles/handlers"
+	"articles/middleware"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -14,7 +15,8 @@ import (
 
 func TestShowRegistrationPageUnauthenticated(t *testing.T) {
 	r := getRouter(true)
-	r.GET("/user/register", handlers.ShowRegistrationPage)
+	r.Use(middleware.SetUserStatus())
+	r.GET("/user/register", middleware.EnsureNotLogin(), handlers.ShowRegistrationPage)
 	req, _ := http.NewRequest("GET", "/user/register", nil)
 
 	testHTTPResponse(t, r, req, func(w *httptest.ResponseRecorder) bool {
@@ -39,7 +41,6 @@ func TestRegisterUnauthenticated(t *testing.T) {
 		t.Fail()
 	}
 	p, err := ioutil.ReadAll(w.Body)
-	fmt.Println(string(p))
 	if err != nil || strings.Index(string(p), "<title>Successful registration &amp;&amp; Login</title>") < 0 {
 		t.Fail()
 	}
