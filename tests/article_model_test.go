@@ -18,3 +18,15 @@ func TestGetAllArticles(t *testing.T) {
 		}
 	}
 }
+
+func TestCreateNewArticle(t *testing.T) {
+	saveLists()
+	originalLength := len(models.GetAllArticles())
+	a, err := models.CreateNewArticle("new test title", "new test content")
+	allArticles := models.GetAllArticles()
+	newLength := len(allArticles)
+	if err != nil || newLength != originalLength+1 || a.Title != "new test title" || a.Content != "new test content" {
+		t.Fail()
+	}
+	restoreList()
+}

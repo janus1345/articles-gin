@@ -6,7 +6,7 @@ import (
 
 func InitializeRoutes() {
 	router.GET("/", handlers.ShowIndexPage)
-	router.GET("/article/view/:article_id", handlers.GetArticle)
+
 	userRoutes := router.Group("/user")
 	{
 		userRoutes.GET("/register", handlers.ShowRegistrationPage)
@@ -15,5 +15,12 @@ func InitializeRoutes() {
 		userRoutes.GET("/login", handlers.ShowLoginPage)
 		userRoutes.POST("/login", handlers.PerformLogin)
 		userRoutes.GET("/logout", handlers.Logout)
+	}
+
+	articleRoutes := router.Group("/article")
+	{
+		articleRoutes.GET("/view/:article_id", handlers.GetArticle)
+		articleRoutes.GET("/create", handlers.ShowArticleCreationPage)
+		articleRoutes.POST("/create", handlers.CreateArticle)
 	}
 }

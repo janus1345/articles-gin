@@ -7,7 +7,6 @@ import (
 	"strconv"
 )
 
-
 func render(c *gin.Context, data gin.H, templateName string) {
 	//loogedInInterface, _ := c.Get("is_logged_in")
 	//data["is_logged_in"] = loogedInInterface.(bool)
@@ -33,10 +32,10 @@ func ShowIndexPage(c *gin.Context) {
 	//	},
 	//	)
 	render(c, gin.H{
-		"title": "Home Page",
+		"title":   "Home Page",
 		"payload": articles,
 	},
-	"index.html",
+		"index.html",
 	)
 }
 
@@ -53,17 +52,34 @@ func GetArticle(c *gin.Context) {
 			//	},
 			//)
 			render(c, gin.H{
-				"title": article.Title,
+				"title":   article.Title,
 				"payload": article,
 			},
-			"article.html",
+				"article.html",
 			)
-		}else {
+		} else {
 			c.AbortWithError(http.StatusNotFound, err)
 		}
-	}else {
+	} else {
 		c.AbortWithError(http.StatusNotFound, err)
 	}
+}
 
+func ShowArticleCreationPage(c *gin.Context) {
+	render(c, gin.H{"title": "Create New Article"}, "create-article.html")
 
+}
+
+func CreateArticle(c *gin.Context) {
+	title := c.PostForm("title")
+	content := c.PostForm("content")
+
+	if a, err := models.CreateNewArticle(title, content); err == nil {
+		render(c, gin.H{
+			"title":   "Submission Successful",
+			"payload": a,
+		}, "submission-successful.html")
+	} else {
+		c.AbortWithStatus(http.StatusBadRequest)
+	}
 }

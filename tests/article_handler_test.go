@@ -9,6 +9,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -97,5 +99,42 @@ func TestArticleListXML(t *testing.T) {
 	})
 }
 
+func TestArticleCreationPage(t *testing.T) {
+	r := getRouter(true)
+	r.GET("/article/create", handlers.ShowArticleCreationPage)
+	req, _ := http.NewRequest("GET", "/article/create", nil)
+	testHTTPResponse(t, r, req, func(w *httptest.ResponseRecorder) bool {
+		statusOk := w.Code == http.StatusOK
+		p, err := ioutil.ReadAll(w.Body)
+		pageOk := err == nil && strings.Index(string(p), "<title>Create New Article</title>") > 0
+		return statusOk && pageOk
+	})
+}
 
+func TestCreateArticle(t *testing.T) {
+	saveLists()
+	r := getRouter(true)
+	r.POST("/article/create", handlers.CreateArticle)
+	createArticlePayload := getCreateArticlePayLoad()
+	req, _ := http.NewRequest("POST", "/article/create", strings.NewReader(createArticlePayload))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Length", strconv.Itoa(len(createArticlePayload)))
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
 
+	if w.Code != http.StatusOK {
+		t.Fail()
+	}
+	p, err := ioutil.ReadAll(w.Body)
+	if err != nil || strings.Index(string(p), "Submission Successful") < 0 {
+		t.Fail()
+	}
+	restoreList()
+}
+
+func getCreateArticlePayLoad() string {
+	parmas := url.Values{}
+	parmas.Add("content", "hahhahah")
+	parmas.Add("title", "hhah title")
+	return parmas.Encode()
+}
